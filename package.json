@@ -1,0 +1,64 @@
+{
+  "name": "project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "build:test": "vue-cli-service build --mode release",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@visactor/vtable": "^1.19.0",
+    "axios": "^1.10.0",
+    "core-js": "^3.8.3",
+    "crypto-js": "^4.2.0",
+    "dhtmlx-gantt": "^9.0.11",
+    "echarts": "^5.6.0",
+    "element-plus": "^2.10.2",
+    "file-saver": "^2.0.5",
+    "pinia": "^3.0.3",
+    "vue": "^3.2.13",
+    "vue-advanced-chat": "^2.1.0",
+    "vue-router": "^4.5.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "postcss-pxtorem": "^6.1.0",
+    "sass": "^1.89.2",
+    "sass-loader": "^16.0.5"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {},
+    "globals": {
+      "defineProps": "readonly",
+      "defineEmits": "readonly",
+      "defineExpose": "readonly",
+      "withDefaults": "readonly"
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}
