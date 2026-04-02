@@ -36,21 +36,33 @@
                 </el-card>
                 <el-card shadow="never" class="left_card" body-style="padding: 0px; height: 100%;">
                     <div class="base_title">发货批次列表</div>
-                    <div class="button_group">
+                    <div class="button_group" style="display: flex; justify-content: space-between">
                         <el-button @click="addListItem" type="primary">新增批次</el-button>
                         <!-- <el-button type="success" size="small">保存</el-button> -->
+                        <el-select
+                            v-model="searchStatus"
+                            placeholder="批次状态"
+                            style="width: 200px"
+                            clearable
+                            @change="searchLeftList">
+                            <el-option
+                                v-for="(item, index) in distList.status"
+                                :key="index"
+                                :label="item"
+                                :value="item" />
+                        </el-select>
                     </div>
                     <div style="padding: 15px; background: #f0f7ff; display: flex; align-items: center; font-size: 12px; line-height: 12px;">
                         总计数:&nbsp;<p style="margin: 0px; font-weight: 600; color: #1890ff; margin-right: 10px;">{{ leftList.length }}</p>
-                        已发货:&nbsp;<p style="margin: 0px; font-weight: 600; color: #1890ff">{{ leftList.filter(item => item.zt_pczt_pd === '已发货').length }}</p>
+                        已发货:&nbsp;<p style="margin: 0px; font-weight: 600; color: #1890ff">{{ leftList.filter(item => ['7:运输中', '8:已到货', '9:服务中', '10:质保期中'].includes(item.zt_pczt_pd)).length }}</p>
                     </div>
-                    <div style="padding: 8px 10px; display: flex">
+                    <!-- <div style="padding: 8px 10px; display: flex">
                         <el-input v-model="searchName" size="small">
                             <template #append>
                                 <el-button @click="getLeftList">查询</el-button>
                             </template>
                         </el-input>
-                    </div>
+                    </div> -->
                     <div class="left_list" :loading="leftLoading">
                         <el-card
                             v-for="(item, index) in leftList"
@@ -83,7 +95,10 @@
                             <el-descriptions class-name="el-descriptions" :column="1">
                                 <el-descriptions-item label="备注:">{{ item.zt_description }}</el-descriptions-item>
                             </el-descriptions>
-                            <el-button type="primary" style="width: 100%" @click.stop="editItem(item)">编辑</el-button>
+                            <div style="width: 100%; display: flex">
+                                <el-button type="primary" style="width: 100%" @click.stop="editItem(item)">编辑</el-button>
+                                <el-button type="danger" style="width: 100%" @click.stop="deleteItem(item)">删除</el-button>
+                            </div>
                         </el-card>
                     </div>
                 </el-card>
@@ -309,11 +324,23 @@
                         <el-input disabled v-model="itemData.zt_batch_number" placeholder="项目批次号" clearable />
                     </el-form-item>
                     <el-form-item label="发货批次-顺序号:" prop="zt_batch_import">
-                        <el-input @input="updateItem" v-model="itemData.zt_batch_import" placeholder="输入A\B\C等字段" clearable />
+                        <!-- <el-input @input="updateItem" v-model="itemData.zt_batch_import" placeholder="输入A\B\C等字段" clearable /> -->
+                        <el-select
+                            v-model="itemData.zt_batch_import"
+                            placeholder="发货批次-顺序号"
+                            @change="updateItem"
+                            clearable>
+                            <el-option
+                                v-for="(item, index) in distList.number"
+                                :key="index"
+                                :label="item"
+                                :value="item" />
+                        </el-select>
                     </el-form-item>
                 </div>
                 <div class="line_flex">
-                    <el-form-item label="批次名称:" prop="zt_sb_xmfhpcmc">
+                    <!-- <el-form-item label="批次名称:" prop="zt_sb_xmfhpcmc"> -->
+                    <el-form-item label="批次名称:">
                         <el-input v-model="itemData.zt_sb_xmfhpcmc" placeholder="批次名称" clearable />
                     </el-form-item>
                     <el-form-item label="批次状态:" prop="zt_pczt_pd">
@@ -486,7 +513,9 @@ import Gantt from '../components/GanttChart.vue'
 
 const loading = ref(false);
 const searchName = ref("");
+const searchStatus = ref("");
 const leftLoading = ref(false);
+const allLeftList = ref([]);
 const leftList = ref([]);
 const projcetDialogVisible = ref(false);
 const dialogVisible = ref(false);
@@ -515,8 +544,10 @@ const rules = ref({
     ],
 })
 const distList = ref({
-    status: ['设计中', '生产中', '完工待发', '已发货待确认', '已发货'],
-    currency: ['CNY', 'EUR', 'GBP', 'USD'],
+    number: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ',],
+    status: ['1:设计中', '2:设计冻结未采购', '3:采购中未生产', '4:生产中', '5:FAT中', '6:完工待发货', '7:运输中', '8:已到货', '9:服务中', '10:质保期中', '已取消', '暂停中', '99:状态未知'],
+    currency: ['CNY', 'USD', 'EUR', 'AUD', 'PHP', 'KWD', 'SGD', 'GBP', 'DZD', 'EGP', 'LKR', 'ETB', 'MYR', 'PKR', ],
     factory: [],
 })
 
@@ -638,6 +669,7 @@ const chooseProject = (item) => {
     activeIndex.value = null;
     projectId = item.proj_number
     projectInfo.value = item
+    searchStatus.value = ''
     getLeftList()
     getGanttData1()
     projcetDialogVisible.value = false;
@@ -672,9 +704,44 @@ const addListItem = () => {
 }
 
 const editItem = (item) => {
-    itemData.value = item;
+    itemData.value = { ...item };
     dialogVisible.value = true;
 }
+
+const deleteItem = (item) => {
+    ElMessageBox.confirm(
+        '是否确认删除该批次?',
+        '提示',
+        {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    )
+    .then(() => {
+        loading.value = true;
+        axios.deleteLeftItem({pcid: item.id})
+        .then(res => {
+            if(res.data.code === 200) {
+                ElMessage.success('删除成功')
+                projectBathcTable.value.tableData = [];
+                planningTable.value.tableData = [];
+                projectGanttData.value = [];
+                checkedProject.value = {};
+                checkedSelectionList.value = [];
+                checkedProjectList = [];
+                activeIndex.value = null;
+                getLeftList()
+                getGanttData1()
+                loading.value = false;
+            } else {
+                ElMessage.error(res.data.msg)
+                loading.value = false;
+            }
+        })
+     })
+}
+
 
 const updateItem = () => {
     itemData.value.zt_batch_number = itemData.value.zt_batch_import ? `${projectInfo.value.proj_number}-${itemData.value.zt_batch_import}` : projectInfo.value.proj_number
@@ -685,10 +752,15 @@ function getLeftList() {
     leftLoading.value = true;
     axios.getLeftList({projNumber: projectId, ztSbXmfhpcmc: searchName.value, post1: projectInfo.value.post1})
     .then(res => {
-        leftList.value = res.data.data;
+        allLeftList.value = res.data.data;
+        leftList.value = [ ...allLeftList.value ];
         // leftList.value.slot()
         leftLoading.value = false;
     })
+}
+
+const searchLeftList = () => {
+    leftList.value = searchStatus.value ? [ ...allLeftList.value.filter(item => item.zt_pczt_pd.includes(searchStatus.value)) ] : [ ...allLeftList.value ];
 }
 
 let dialogLoading = ref(false)
@@ -727,7 +799,8 @@ const selectItem = (item, index) => {
 
 const ganttData2 = ref([])
 const getGanttData2 = () => {
-    axios.getGanttData2(leftList.value[activeIndex.value].zt_sb_xmfhpch)
+    // axios.getGanttData2(leftList.value[activeIndex.value].zt_sb_xmfhpch)
+    axios.getGanttData2(leftList.value[activeIndex.value].id)
     .then(res => {
         ganttData2.value = setGanttData(res.data.data);
     })
@@ -804,7 +877,8 @@ const projectGanttData = ref([])
 const ganttType = ref(null)
 const ganttData3 = ref([])
 const checkedItem = (item) => {
-    axios.getPlanningList(leftList.value[activeIndex.value].zt_sb_xmfhpch)
+    // axios.getPlanningList(leftList.value[activeIndex.value].zt_sb_xmfhpch)
+    axios.getPlanningList(leftList.value[activeIndex.value].id)
     .then(res => {
         planningTable.value.tableData = res.data.data;
     })

@@ -23,6 +23,10 @@ export default {
     updateLeftItem(query) {
         return axios.post(`projectbatch/shippingBatchStorage`, query)
     },
+    // 删除发货批次
+    deleteLeftItem(query) {
+        return axios.post(`projectbatch/deleteBatchByPcid`, query)
+    },
     // 所有物料列表
     getAllProjectBatchList(val) {
         // return axios.get(`projectbatch/popUpQueryTableList?proNumber=${proNumber}&ztSbXmfhpch=${ztSbXmfhpch}&pageNum=${page}&pageSize=${size}`)
